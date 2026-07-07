@@ -1,0 +1,1437 @@
+/*=============================================================================
+  SPECTRE
+  A premium, cinematic Jellyfin theme
+  Luxury / Minimal / Modern / Glassmorphism / Crimson accents
+
+  Built against Jellyfin's actual production class names extracted from the
+  supplied main bundle. Sections marked [UNVERIFIED] use Jellyfin's commonly
+  documented class names for login/player, since those load as separate
+  lazy chunks not present in the supplied file — check with DevTools if
+  something in those two sections doesn't visibly apply.
+=============================================================================*/
+
+/*=============================================================================
+  01. ROOT VARIABLES
+=============================================================================*/
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+:root{
+  /* Brand */
+  --spectre-primary:#d90429;
+  --spectre-primary-rgb:217,4,41;
+  --spectre-secondary:#ef233c;
+  --spectre-secondary-rgb:239,35,60;
+  --spectre-glow:rgba(217,4,41,.35);
+
+  /* Backgrounds */
+  --spectre-bg:#050505;
+  --spectre-bg-elevated:#0d0d10;
+  --spectre-bg-card:#141417;
+  --spectre-bg-glass:rgba(20,20,23,.55);
+  --spectre-bg-dialog:#16161a;
+
+  /* Text */
+  --spectre-text:#f5f5f7;
+  --spectre-text-secondary:#c7c9cf;
+  --spectre-text-muted:#84868f;
+
+  /* Borders / glass */
+  --spectre-border:rgba(255,255,255,.07);
+  --spectre-glass-border:rgba(255,255,255,.09);
+  --spectre-blur:22px;
+
+  /* Radius */
+  --spectre-radius-sm:12px;
+  --spectre-radius-md:18px;
+  --spectre-radius-lg:24px;
+  --spectre-radius-pill:999px;
+
+  /* Motion */
+  --spectre-speed:250ms;
+  --spectre-speed-slow:400ms;
+  --spectre-ease:cubic-bezier(.22,.61,.36,1);
+
+  /* Shadows */
+  --spectre-shadow-sm:0 6px 18px rgba(0,0,0,.25);
+  --spectre-shadow-md:0 14px 34px rgba(0,0,0,.35);
+  --spectre-shadow-lg:0 26px 60px rgba(0,0,0,.5);
+}
+
+/*=============================================================================
+  01b. THEME PRESETS
+  Toggle by setting data-theme="..." on <html>. The companion script
+  (spectre-theme-switcher.js) does this for you with a floating picker UI
+  and remembers your choice in localStorage.
+=============================================================================*/
+
+html[data-theme="crimson"]{ --spectre-primary:#d90429; --spectre-primary-rgb:217,4,41; --spectre-glow:rgba(217,4,41,.35); }
+html[data-theme="blue"]{ --spectre-primary:#3b82f6; --spectre-primary-rgb:59,130,246; --spectre-glow:rgba(59,130,246,.35); }
+html[data-theme="purple"]{ --spectre-primary:#8b5cf6; --spectre-primary-rgb:139,92,246; --spectre-glow:rgba(139,92,246,.35); }
+html[data-theme="emerald"]{ --spectre-primary:#10b981; --spectre-primary-rgb:16,185,129; --spectre-glow:rgba(16,185,129,.35); }
+html[data-theme="gold"]{ --spectre-primary:#d4af37; --spectre-primary-rgb:212,175,55; --spectre-glow:rgba(212,175,55,.35); }
+html[data-theme="cyan"]{ --spectre-primary:#06b6d4; --spectre-primary-rgb:6,182,212; --spectre-glow:rgba(6,182,212,.35); }
+
+/*=============================================================================
+  01c. THEME SWITCHER WIDGET (styles only — see spectre-theme-switcher.js)
+=============================================================================*/
+
+.spectre-switcher{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:99999;
+  display:flex;
+  gap:8px;
+  padding:10px;
+  background:var(--spectre-bg-glass);
+  backdrop-filter:blur(var(--spectre-blur));
+  border:1px solid var(--spectre-glass-border);
+  border-radius:var(--spectre-radius-pill);
+  box-shadow:var(--spectre-shadow-md);
+}
+
+.spectre-switcher button{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.25);
+  cursor:pointer;
+  transition:transform 200ms ease, border-color 200ms ease;
+  padding:0;
+}
+.spectre-switcher button:hover{ transform:scale(1.15); }
+.spectre-switcher button.active{ border-color:#fff; }
+
+*{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  background:var(--spectre-bg);
+  color:var(--spectre-text);
+  font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+
+h1,h2,h3,h4{
+  font-family:"Inter",sans-serif;
+  letter-spacing:-.3px;
+}
+
+h1{ font-size:2.4rem; font-weight:800; }
+h2{ font-weight:700; }
+h3{ font-weight:600; }
+
+a{ color:var(--spectre-primary); transition:color var(--spectre-speed) var(--spectre-ease); }
+a:hover{ color:#fff; }
+
+::-webkit-scrollbar{ width:11px; height:11px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{
+  background:rgba(var(--spectre-primary-rgb),.5);
+  border-radius:var(--spectre-radius-pill);
+  border:2px solid var(--spectre-bg);
+}
+::-webkit-scrollbar-thumb:hover{ background:var(--spectre-primary); }
+
+::selection{ background:rgba(var(--spectre-primary-rgb),.85); color:#fff; }
+
+@keyframes spectreFadeIn{
+  from{ opacity:0; transform:translateY(8px); }
+  to{ opacity:1; transform:none; }
+}
+
+.page{ animation:spectreFadeIn var(--spectre-speed-slow) var(--spectre-ease); }
+.mainAnimatedPage{ contain:layout style size; }
+
+.skinBody{
+  background:
+    radial-gradient(ellipse 900px 600px at 8% -8%, rgba(217,4,41,.22), transparent 55%),
+    radial-gradient(ellipse 700px 550px at 105% 8%, rgba(139,92,246,.16), transparent 55%),
+    radial-gradient(ellipse 750px 500px at 90% 95%, rgba(6,182,212,.12), transparent 55%),
+    radial-gradient(ellipse 650px 500px at 5% 100%, rgba(239,35,60,.14), transparent 55%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.012) 0px, rgba(255,255,255,.012) 1px, transparent 1px, transparent 3px),
+    var(--spectre-bg) !important;
+  background-attachment:fixed;
+}
+
+.pageContainer{ padding:20px 32px 48px; }
+
+/*=============================================================================
+  03. HEADER
+=============================================================================*/
+
+.skinHeader{
+  background:rgba(8,8,10,.68) !important;
+  backdrop-filter:blur(var(--spectre-blur));
+  -webkit-backdrop-filter:blur(var(--spectre-blur));
+  border-bottom:1px solid var(--spectre-border) !important;
+  box-shadow:var(--spectre-shadow-sm);
+  height:68px;
+}
+
+.headerTop{ height:68px; }
+
+/* Custom Spectre branding replacing Jellyfin's default logo/title */
+.pageTitle,
+.pageTitleWithDefaultLogo,
+.pageTitleWithLogo{
+  font-size:0 !important;
+}
+.pageTitle::after{
+  content:"SPECTRE";
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:8px;
+  color:var(--spectre-text);
+}
+
+.headerLeft,
+.headerRight{ display:flex; align-items:center; gap:4px; }
+
+.headerButton{
+  width:40px;
+  height:40px;
+  border-radius:var(--spectre-radius-pill);
+  transition:background var(--spectre-speed) var(--spectre-ease),
+             transform var(--spectre-speed) var(--spectre-ease);
+}
+.headerButton:hover{
+  background:rgba(255,255,255,.08);
+  transform:translateY(-1px);
+}
+
+.headerUserButtonRound{
+  border-radius:var(--spectre-radius-pill) !important;
+  border:2px solid rgba(var(--spectre-primary-rgb),.5);
+  background:rgba(var(--spectre-primary-rgb),.12);
+  transition:background var(--spectre-speed) var(--spectre-ease),
+             box-shadow var(--spectre-speed) var(--spectre-ease);
+}
+.headerUserButtonRound:hover{
+  background:rgba(var(--spectre-primary-rgb),.28);
+  box-shadow:0 0 14px var(--spectre-glow);
+}
+
+.headerTabs{
+  gap:6px;
+}
+
+/*=============================================================================
+  04. SEARCH BAR
+=============================================================================*/
+
+.searchfields-icon{ color:var(--spectre-text-muted); }
+
+/* Jellyfin's search field is an .emby-input — styled globally in Inputs
+   section below, this block only adjusts the search-specific container */
+.headerSearchInput,
+input[is="emby-input"].headerSearchInput{
+  background:var(--spectre-bg-glass) !important;
+  border:1px solid var(--spectre-glass-border) !important;
+  border-radius:var(--spectre-radius-pill) !important;
+  backdrop-filter:blur(var(--spectre-blur));
+  padding-left:18px !important;
+}
+
+/*=============================================================================
+  05. SIDEBAR / DRAWER
+=============================================================================*/
+
+.mainDrawer{
+  background:rgba(8,8,10,.75) !important;
+  backdrop-filter:blur(var(--spectre-blur));
+  border-right:1px solid var(--spectre-border);
+}
+
+.sidebarHeader{
+  border-bottom:1px solid var(--spectre-border);
+  padding-bottom:14px;
+}
+
+.navMenuOption{
+  border-radius:var(--spectre-radius-sm);
+  margin:2px 10px;
+  transition:background var(--spectre-speed) var(--spectre-ease),
+             color var(--spectre-speed) var(--spectre-ease);
+}
+.navMenuOption:hover{ background:rgba(255,255,255,.06); }
+.navMenuOption.selected,
+.navMenuOption[aria-selected="true"]{
+  background:rgba(var(--spectre-primary-rgb),.15);
+  color:var(--spectre-primary);
+}
+.navMenuOptionIcon{ opacity:.85; }
+
+/*=============================================================================
+  06. BUTTONS
+=============================================================================*/
+
+.emby-button,
+.raised,
+.detailButton,
+button{
+  border-radius:var(--spectre-radius-pill);
+  transition:background var(--spectre-speed) var(--spectre-ease),
+             color var(--spectre-speed) var(--spectre-ease),
+             transform var(--spectre-speed) var(--spectre-ease),
+             box-shadow var(--spectre-speed) var(--spectre-ease);
+}
+
+.raised{
+  background:rgba(var(--spectre-primary-rgb),.9);
+  color:#fff;
+  border:1px solid rgba(var(--spectre-primary-rgb),.6);
+}
+.raised:hover{
+  background:var(--spectre-primary);
+  transform:scale(1.03);
+  box-shadow:0 0 18px var(--spectre-glow);
+}
+
+.button-flat,
+.button-link{
+  color:var(--spectre-text-secondary);
+}
+.button-flat:hover,
+.button-link:hover{
+  color:#fff;
+}
+
+.button-accent-flat{
+  color:var(--spectre-primary);
+}
+
+.fab,
+.cardOverlayFab-primary,
+.detailFloatingButton{
+  background:var(--spectre-primary) !important;
+  color:#fff !important;
+  box-shadow:0 0 22px var(--spectre-glow);
+  transition:transform var(--spectre-speed) var(--spectre-ease),
+             box-shadow var(--spectre-speed) var(--spectre-ease);
+}
+.fab:hover,
+.cardOverlayFab-primary:hover,
+.detailFloatingButton:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 30px var(--spectre-glow);
+}
+
+.detailButton-content{ display:flex; align-items:center; gap:8px; }
+
+/*=============================================================================
+  07. INPUTS / SWITCHES / CHECKBOXES / DROPDOWNS
+=============================================================================*/
+
+.emby-input,
+.inputContainer input{
+  background:var(--spectre-bg-elevated);
+  border:1px solid var(--spectre-border) !important;
+  border-radius:var(--spectre-radius-sm);
+  color:var(--spectre-text);
+  padding:10px 14px;
+  transition:border-color var(--spectre-speed) var(--spectre-ease),
+             box-shadow var(--spectre-speed) var(--spectre-ease);
+}
+.emby-input:focus{
+  border-color:var(--spectre-primary) !important;
+  box-shadow:0 0 0 3px rgba(var(--spectre-primary-rgb),.18);
+  outline:none;
+}
+
+.inputLabel{ color:var(--spectre-text-muted); font-size:.85rem; }
+
+/* Checkboxes */
+.emby-checkbox-label{ color:var(--spectre-text-secondary); }
+.checkboxOutline{
+  border-radius:6px !important;
+  border-color:var(--spectre-glass-border) !important;
+}
+.checkboxIcon-checked{
+  color:var(--spectre-primary) !important;
+}
+
+/* Dropdowns */
+.selectContainer{
+  background:var(--spectre-bg-elevated);
+  border:1px solid var(--spectre-border);
+  border-radius:var(--spectre-radius-sm);
+}
+.selectArrowContainer{ color:var(--spectre-text-muted); }
+
+/* Modern switch look — Jellyfin uses emby-toggle in settings pages;
+   re-skinned generically so it applies wherever the toggle markup appears */
+.emby-toggle-switch,
+label.checkboxContainer input[type="checkbox"] + span{
+  background:rgba(255,255,255,.12);
+  border-radius:var(--spectre-radius-pill);
+  transition:background var(--spectre-speed) var(--spectre-ease);
+}
+
+/*=============================================================================
+  08. CARDS / POSTER HOVER
+=============================================================================*/
+
+.cardBox{
+  border-radius:var(--spectre-radius-md);
+  overflow:hidden;
+  background:var(--spectre-bg-card);
+  transition:transform var(--spectre-speed) var(--spectre-ease),
+             box-shadow var(--spectre-speed) var(--spectre-ease);
+}
+
+.card-hoverable:hover .cardBox{
+  transform:translateY(-6px) scale(1.035);
+  box-shadow:var(--spectre-shadow-md), 0 0 24px var(--spectre-glow);
+  z-index:4;
+}
+
+.cardImageContainer{
+  border-radius:var(--spectre-radius-md);
+  overflow:hidden;
+  isolation:isolate; /* ensures the rounded clip applies cleanly even with the default-color background layer */
+}
+
+.cardImage,
+.cardPadder,
+.defaultCardBackground{
+  border-radius:inherit;
+}
+
+.cardImage{
+  transition:transform var(--spectre-speed-slow) var(--spectre-ease);
+}
+.card-hoverable:hover .cardImage{
+  transform:scale(1.08);
+}
+
+.cardContent-shadow{
+  background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.75) 100%);
+}
+
+.cardOverlayContainer{ border-radius:var(--spectre-radius-md); }
+
+.cardOverlayButton{
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
+  border-radius:var(--spectre-radius-pill);
+  transition:background var(--spectre-speed) var(--spectre-ease),
+             transform var(--spectre-speed) var(--spectre-ease);
+}
+.cardOverlayButton-hover:hover{
+  background:var(--spectre-primary);
+  transform:scale(1.1);
+}
+
+/*=============================================================================
+  08b. DEFAULT LIBRARY CARD COLOR
+  Jellyfin assigns a random flat color (e.g. the bright blue "Movies" box)
+  via inline style on .defaultCardBackground when a library has no custom
+  image. Overriding with !important replaces that random color with a
+  consistent brand-matched gradient instead.
+=============================================================================*/
+
+.defaultCardBackground{
+  background:linear-gradient(150deg,#1a1a1f 0%,rgba(var(--spectre-primary-rgb),.35) 140%) !important;
+}
+.defaultCardBackground .cardImageIcon{
+  color:rgba(255,255,255,.85) !important;
+}
+
+/*=============================================================================
+  08c. HAMBURGER MENU BUTTON
+  Restored after testing — hiding it broke the drawer's only close control,
+  leaving it permanently stuck open. It's also not redundant with the
+  person icon: this opens library/admin navigation (Movies, Shows,
+  Dashboard), while the person icon only handles account actions
+  (Settings, Sign Out) — they serve different purposes. Styled subtly
+  instead of removed.
+=============================================================================*/
+
+.mainDrawerButton{
+  opacity:.75;
+  transition:opacity var(--spectre-speed) var(--spectre-ease);
+}
+.mainDrawerButton:hover{
+  opacity:1;
+}
+
+.cardDefaultText{
+  color:var(--spectre-text-secondary);
+  font-weight:500;
+}
+
+.cardFooter-withlogo .cardFooterLogo{ opacity:.9; }
+
+/*=============================================================================
+  09. HOME PAGE / MEDIA ROWS / SECTIONS
+=============================================================================*/
+
+.sectionTitle{
+  font-size:1.25rem;
+  font-weight:700;
+  border-left:3px solid var(--spectre-primary);
+  padding-left:12px;
+  margin-bottom:12px;
+}
+
+.sectionTitleContainer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.sectionTitleButton,
+.sectionTitleIconButton,
+.sectionTitleTextButton{
+  color:var(--spectre-text-muted);
+}
+.sectionTitleButton:hover{ color:var(--spectre-primary); }
+
+.emby-scroller{ padding:4px 0 24px; }
+
+.emby-scrollbuttons button{
+  background:var(--spectre-bg-glass);
+  backdrop-filter:blur(var(--spectre-blur));
+  border-radius:var(--spectre-radius-pill);
+}
+
+/*=============================================================================
+  10. CONTINUE WATCHING / PROGRESS BARS
+=============================================================================*/
+
+.backgroundProgress,
+.itemBackdropProgressBar,
+.listItemProgressBar,
+.playbackProgress{
+  height:5px;
+  border-radius:var(--spectre-radius-pill);
+  background:rgba(255,255,255,.16) !important;
+  overflow:hidden;
+}
+
+.playbackProgress > *,
+.itemBackdropProgressBar > *{
+  background:var(--spectre-primary) !important;
+  box-shadow:0 0 8px var(--spectre-glow);
+}
+
+.detailImageProgressContainer{
+  border-radius:0 0 var(--spectre-radius-md) var(--spectre-radius-md);
+  overflow:hidden;
+}
+
+/*=============================================================================
+  11. LIBRARY PAGE
+=============================================================================*/
+
+.libraryPage .sectionTitle{ font-size:1.5rem; }
+
+.localnav{
+  background:transparent;
+  border-bottom:1px solid var(--spectre-border);
+}
+
+/*=============================================================================
+  12. DETAIL PAGE (movies / episodes)
+=============================================================================*/
+
+.detailPagePrimaryContainer{
+  border-radius:var(--spectre-radius-lg);
+  overflow:hidden;
+  box-shadow:var(--spectre-shadow-md);
+}
+
+.detailImageContainer{ border-radius:var(--spectre-radius-lg); }
+
+.detailPageContent{ padding-top:24px; }
+
+.detailPageSecondaryContainer{
+  background:var(--spectre-bg-glass);
+  backdrop-filter:blur(var(--spectre-blur));
+  border-radius:var(--spectre-radius-md);
+  border:1px solid var(--spectre-glass-border);
+  padding:20px;
+}
+
+.detailVerticalSection + .detailVerticalSection{
+  margin-top:22px;
+}
+
+.detailRibbon{
+  border-radius:var(--spectre-radius-sm);
+  background:rgba(var(--spectre-primary-rgb),.85);
+}
+
+/* Cast cards */
+.personBackdrop,
+.cardBox .cardImageContainer.personCard,
+.card.personCard .cardBox{
+  border-radius:var(--spectre-radius-pill);
+}
+
+/* Genre / studio chips (Jellyfin renders these as itemTag / plain links
+   inside .itemMiscInfo — styled generically since exact wrapper varies
+   between movie and episode templates) */
+.itemTag,
+.genreButton,
+.studioButton{
+  display:inline-block;
+  padding:4px 12px;
+  margin:0 6px 6px 0;
+  border-radius:var(--spectre-radius-pill);
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--spectre-glass-border);
+  font-size:.78rem;
+  color:var(--spectre-text-secondary);
+}
+
+/* Critic / community rating */
+.criticRating{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:var(--spectre-radius-pill);
+  background:rgba(255,255,255,.06);
+}
+.criticRatingScore{ font-weight:700; color:var(--spectre-text); }
+
+/* Detail table (episode list / media info) */
+.detailTable{ border-collapse:separate; border-spacing:0 6px; }
+.detailTableHeaderCell{ color:var(--spectre-text-muted); font-weight:600; }
+.detailTableBodyCell{
+  background:var(--spectre-bg-elevated);
+  border-radius:var(--spectre-radius-sm);
+}
+
+/*=============================================================================
+  13. DASHBOARD / ADMIN / SETTINGS
+=============================================================================*/
+
+.dashboardSections{ gap:16px; }
+
+.dashboardSection{
+  background:var(--spectre-bg-glass);
+  backdrop-filter:blur(var(--spectre-blur));
+  border:1px solid var(--spectre-glass-border);
+  border-radius:var(--spectre-radius-md);
+  padding:18px;
+}
+
+.dashboardEntryHeaderButton{ color:var(--spectre-text-muted); }
+
+/*=============================================================================
+  14. COLLECTIONS
+=============================================================================*/
+
+.card.collectionCard .cardBox{ border:1px solid transparent; }
+.card.collectionCard .cardBox:hover{ border-color:rgba(var(--spectre-primary-rgb),.4); }
+
+/*=============================================================================
+  15. LIST ITEMS (queues, episode lists, plugin lists, etc.)
+=============================================================================*/
+
+.listItem{
+  border-radius:var(--spectre-radius-sm);
+  transition:background var(--spectre-speed) var(--spectre-ease);
+}
+.listItem:hover{ background:rgba(255,255,255,.05); }
+.listItem-border{ border-bottom:1px solid var(--spectre-border); }
+
+.listItemImage{ border-radius:10px; }
+.listItemImage-large{ border-radius:var(--spectre-radius-sm); }
+
+.listItemBodyText{ color:var(--spectre-text-secondary); }
+
+/*=============================================================================
+  16. DIALOGS / NOTIFICATIONS / TOASTS
+=============================================================================*/
+
+.dialog{
+  background:var(--spectre-bg-dialog);
+  border:1px solid var(--spectre-glass-border);
+  border-radius:var(--spectre-radius-lg);
+  box-shadow:var(--spectre-shadow-lg);
+  backdrop-filter:blur(var(--spectre-blur));
+}
+
+.dialogBackdrop{
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(6px);
+}
+
+.formDialogHeader{ border-bottom:1px solid var(--spectre-border); }
+.formDialogFooter{ border-top:1px solid var(--spectre-border); }
+
+.toast{
+  background:var(--spectre-bg-glass);
+  backdrop-filter:blur(var(--spectre-blur));
+  border:1px solid var(--spectre-glass-border);
+  border-radius:var(--spectre-radius-sm);
+  box-shadow:var(--spectre-shadow-md);
+}
+
+/*=============================================================================
+  16b. USER MENU (person icon dropdown) — superseded, see Section 30b
+  This originally guessed at generic .dialog/.actionSheet classes. Real
+  markup turned out to be MUI-based (.MuiMenu-paper/.MuiMenuItem-root) —
+  see Section 30b below for the corrected, confirmed rules. Left here inert
+  since it's harmless (these classes just don't exist on this menu) but
+  removable if you want to trim the file.
+=============================================================================*/
+
+.actionSheet .listItem,
+.dialog .listItem{
+  border-radius:var(--spectre-radius-sm);
+}
+.actionSheet .listItem:hover,
+.dialog .listItem:hover{
+  background:rgba(var(--spectre-primary-rgb),.14);
+  color:var(--spectre-text);
+}
+.actionSheet .listItemIcon,
+.dialog .listItemIcon{
+  color:var(--spectre-primary);
+}
+
+/*=============================================================================
+  17. LOADING SPINNER
+=============================================================================*/
+
+.mdl-spinner__layer-1,
+.mdl-spinner__layer-2,
+.mdl-spinner__layer-3,
+.mdl-spinner__layer-4{
+  border-color:var(--spectre-primary) !important;
+}
+
+/*=============================================================================
+  18. ICONS
+=============================================================================*/
+
+.material-icons{
+  transition:color var(--spectre-speed) var(--spectre-ease);
+}
+
+/*=============================================================================
+  19. USER PROFILE PAGE
+=============================================================================*/
+
+.headerUserImage{
+  border-radius:var(--spectre-radius-pill);
+  border:2px solid rgba(var(--spectre-primary-rgb),.5);
+}
+
+.activitylogUserPhoto{ border-radius:var(--spectre-radius-pill); }
+
+/*=============================================================================
+  20. LOGIN PAGE
+  Confirmed against real markup from the live login page HTML:
+    #loginPage.page.standalonePage.backdropPage.mainAnimatedPage
+    form.manualLoginForm (no .loginPage .card wrapper — that assumption
+    in the previous version was wrong and has been removed)
+  Your custom Branding > Splashscreen image already renders behind this via
+  .backdropContainer/.backdropImage with its own vignette and centered
+  logo, so this section no longer stacks an extra tint gradient on top of
+  it — that was fighting your image's built-in contrast.
+=============================================================================*/
+
+#loginPage.backdropPage{
+  background:transparent !important; /* let the splashscreen backdrop show through untouched */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+#loginPage.backdropPage.hide{
+  display:none !important; /* explicit safeguard: never fight Jellyfin's own page-hide logic */
+}
+
+#loginPage.backdropPage > div{
+  margin:0 !important; /* override Jellyfin's own margin-auto-y, we're centering via flex instead */
+  width:100%;
+  max-width:460px;
+}
+
+#loginPage .padded-left.padded-right.padded-bottom-page.margin-auto-y{
+  margin:auto !important;
+}
+
+.manualLoginForm{
+  background:var(--spectre-bg-glass);
+  backdrop-filter:blur(var(--spectre-blur));
+  -webkit-backdrop-filter:blur(var(--spectre-blur));
+  border:1px solid var(--spectre-glass-border);
+  border-radius:var(--spectre-radius-lg);
+  box-shadow:var(--spectre-shadow-lg);
+  padding:36px 40px;
+  max-width:420px;
+  position:relative;
+}
+
+.manualLoginForm::before{
+  content:"SPECTRE";
+  display:block;
+  text-align:center;
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:9px;
+  color:var(--spectre-primary);
+  margin-bottom:18px;
+  text-shadow:0 0 18px var(--spectre-glow);
+}
+
+.manualLoginForm .sectionTitle{
+  border-left:none;
+  padding-left:0;
+  text-align:center;
+  font-size:1.4rem;
+}
+
+.manualLoginForm .inputContainer{ margin-bottom:16px; }
+
+.manualLoginForm .raised.button-submit{
+  margin-top:8px;
+}
+
+.readOnlyContent .raised{
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--spectre-glass-border);
+  color:var(--spectre-text-secondary);
+  margin-bottom:8px;
+}
+.readOnlyContent .raised:hover{
+  background:rgba(255,255,255,.1);
+  color:#fff;
+}
+
+.readOnlyContent .btnQuick,
+.readOnlyContent .btnForgotPassword{
+  box-shadow:none;
+}
+
+/*=============================================================================
+  21. PLAYBACK / VIDEO OSD — confirmed against real markup
+  Uses the classic mdl-slider system (input[is="emby-slider"] plus
+  .mdl-slider-background-lower/-upper overlay divs), not MUI as originally
+  guessed. Buttons are .paper-icon-button-light with .material-icons inside
+  (.btnPause, .btnRewind, .btnFastForward, .buttonMute, .btnFullscreen,
+  .btnPip, .btnVideoOsdSettings, .btnSubtitles, .btnUserRating, etc.)
+=============================================================================*/
+
+.videoOsdBottom{
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.85)) !important;
+}
+
+.osdControls button,
+.videoOsd button{
+  color:#fff;
+  transition:transform var(--spectre-speed) var(--spectre-ease),
+             color var(--spectre-speed) var(--spectre-ease);
+}
+.osdControls button:hover,
+.videoOsd button:hover{
+  color:var(--spectre-primary);
+  transform:scale(1.1);
+}
+
+.sliderBubble{
+  background:var(--spectre-primary) !important;
+}
+
+/* The native <input type="range"> needs its default appearance stripped
+   before a custom thumb color will actually apply in most browsers —
+   without this, the browser's own blue thumb can override the pseudo-
+   element rule below regardless of what color we set on it. */
+input[is="emby-slider"]{
+  -webkit-appearance:none;
+  appearance:none;
+  background:transparent;
+}
+
+input[is="emby-slider"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  background:#d4af37 !important;
+  border:2px solid rgba(0,0,0,.25);
+  box-shadow:0 0 8px rgba(212,175,55,.5);
+}
+input[is="emby-slider"]::-moz-range-thumb{
+  background:#d4af37 !important;
+  border:2px solid rgba(0,0,0,.25);
+  box-shadow:0 0 8px rgba(212,175,55,.5);
+}
+
+/* The visible track color isn't drawn by the native <input> itself — Jellyfin
+   renders it via these two overlay divs, which is why only the thumb was
+   turning red before and the track stayed the default blue */
+.mdl-slider-background-lower{
+  background:var(--spectre-primary) !important;
+}
+.mdl-slider-background-upper{
+  background:rgba(255,255,255,.22) !important;
+}
+
+.sliderMarker.watched{
+  background:rgba(var(--spectre-primary-rgb),.6) !important;
+}
+
+.osdControls .buttons button:hover .material-icons,
+.buttonMute:hover .material-icons,
+.btnFullscreen:hover .material-icons,
+.btnPip:hover .material-icons,
+.btnVideoOsdSettings:hover .material-icons,
+.btnUserRating:hover .material-icons,
+.btnSubtitles:hover .material-icons{
+  color:var(--spectre-primary) !important;
+}
+
+/*=============================================================================
+  22. ANIMATIONS
+=============================================================================*/
+
+@keyframes spectreGlowPulse{
+  0%,100%{ box-shadow:0 0 14px var(--spectre-glow); }
+  50%{ box-shadow:0 0 26px var(--spectre-glow); }
+}
+.fab{ animation:spectreGlowPulse 3.2s ease-in-out infinite; }
+
+/*=============================================================================
+  23. ACCESSIBILITY / RESPONSIVE
+=============================================================================*/
+
+:focus-visible{
+  outline:2px solid rgba(var(--spectre-primary-rgb),.5);
+  outline-offset:2px;
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{ animation:none !important; transition:none !important; }
+}
+
+@media (max-width:700px){
+  .pageContainer{ padding:14px 16px 32px; }
+  .card-hoverable:hover .cardBox{ transform:none; }
+}
+
+/*=============================================================================
+  END OF SPECTRE
+=============================================================================*/
+
+/*=============================================================================
+  24. CUSTOM REQUESTED TWEAKS
+=============================================================================*/
+
+/* ---- Default library folder color (the flat solid-color card shown when
+   a library has no custom image, e.g. your plain blue "Movies" tile) ----
+   Jellyfin assigns these via inline background-color on .cardImageIcon's
+   parent, so we override with !important to force our own gradient. */
+
+.cardImageContainer:has(.cardImageIcon){
+  background:linear-gradient(135deg,
+    rgba(var(--spectre-primary-rgb),.9),
+    #1a1a1e 130%) !important;
+}
+
+.cardImageIcon{
+  color:rgba(255,255,255,.9) !important;
+}
+
+/* ---- Stronger, more colorful hover states on header icons ---- */
+
+.headerButton:hover{
+  background:rgba(var(--spectre-primary-rgb),.22) !important;
+  box-shadow:0 0 16px var(--spectre-glow);
+  color:var(--spectre-primary);
+}
+
+.headerButton:hover .material-icons{
+  color:var(--spectre-primary);
+}
+
+/* SyncPlay / cast icons already carry their own accent color (blue) when
+   active — leave those alone so their state meaning stays clear, only
+   restyle the hover ring around them */
+.headerSyncButton:hover,
+.headerCastButton:hover{
+  box-shadow:0 0 16px rgba(59,130,246,.4);
+}
+
+/* Person icon (opens user menu) — give it a subtle accent ring */
+
+.headerUserButton{
+  border-radius:var(--spectre-radius-pill);
+  border:1px solid rgba(var(--spectre-primary-rgb),.35);
+}
+.headerUserButton:hover{
+  border-color:var(--spectre-primary);
+}
+
+/* ---- Richer, more unique full-page background ---- */
+
+.skinBody{
+  background:
+    radial-gradient(circle at 15% 10%, rgba(var(--spectre-primary-rgb),.10), transparent 35%),
+    radial-gradient(circle at 85% 0%, rgba(139,92,246,.07), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(var(--spectre-primary-rgb),.06), transparent 45%),
+    linear-gradient(180deg,#0a0a0d 0%,#050505 55%,#000000 100%) !important;
+}
+
+/* Subtle color separation for the "My Media" / shelf sections so the page
+   doesn't read as one flat black block */
+.homeSectionsContainer > div:nth-of-type(odd){
+  background:linear-gradient(90deg, rgba(var(--spectre-primary-rgb),.03), transparent 60%);
+}
+
+/*=============================================================================
+  END OF SPECTRE
+=============================================================================*/
+
+/*=============================================================================
+  24. BACKGROUND TEXTURE — more unique than flat black
+=============================================================================*/
+
+.skinBody{
+  background:
+    radial-gradient(circle at 15% 0%, rgba(var(--spectre-primary-rgb),.09), transparent 35%),
+    radial-gradient(circle at 85% 15%, rgba(var(--spectre-primary-rgb),.05), transparent 40%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0px, rgba(255,255,255,.012) 1px, transparent 1px, transparent 3px),
+    var(--spectre-bg) !important;
+}
+
+/*=============================================================================
+  25. DEFAULT LIBRARY / FOLDER FALLBACK COLORS
+  Jellyfin cycles unstyled library tiles (no custom image set) through
+  .defaultCardBackground1 through 5 — these ship blue/green/purple/etc by
+  default (that's the bright cyan "Movies" tile). Recolored to sit inside
+  the Spectre palette instead of clashing with it.
+=============================================================================*/
+
+.defaultCardBackground1{ background-color:#3a0d12 !important; }
+.defaultCardBackground2{ background-color:#5a1219 !important; }
+.defaultCardBackground3{ background-color:#1c1c1f !important; }
+.defaultCardBackground4{ background-color:#701825 !important; }
+.defaultCardBackground5{ background-color:#2a2a2e !important; }
+
+.cardImageIcon{ color:rgba(255,255,255,.85) !important; }
+
+/*=============================================================================
+  26. ACCENT-BLUE OVERRIDES (SyncPlay / active toggle states)
+  Jellyfin's legacy default accent (#00A4DC blue) still shows through on a
+  few active/toggled icon buttons regardless of theme — forced to Spectre
+  red here so nothing breaks the palette.
+=============================================================================*/
+
+.headerSyncButton,
+.syncButton,
+[title="SyncPlay"],
+.paper-icon-button-light.active{
+  background-color:rgba(var(--spectre-primary-rgb),.85) !important;
+  color:#fff !important;
+}
+
+/*=============================================================================
+  28. DETAIL PAGE (movie/episode) — styled against confirmed real markup
+=============================================================================*/
+
+.detailLogo{
+  max-width:340px;
+  max-height:140px;
+  margin:24px 0 8px;
+  filter:drop-shadow(0 6px 20px rgba(0,0,0,.6));
+}
+
+.nameContainer .parentName{
+  font-size:2rem;
+  font-weight:800;
+  letter-spacing:-.5px;
+  margin-bottom:4px;
+}
+.nameContainer .itemName.subtitle{
+  font-size:1.1rem;
+  font-weight:500;
+  color:var(--spectre-text-secondary);
+}
+
+.itemMiscInfo.itemMiscInfo-primary{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.itemMiscInfo .mediaInfoItem{
+  padding:4px 12px;
+  border-radius:var(--spectre-radius-pill);
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--spectre-glass-border);
+  font-size:.85rem;
+  color:var(--spectre-text-secondary);
+}
+.itemMiscInfo .starRatingContainer{
+  padding:4px 12px;
+  border-radius:var(--spectre-radius-pill);
+  background:rgba(var(--spectre-primary-rgb),.16);
+  border:1px solid rgba(var(--spectre-primary-rgb),.3);
+  color:var(--spectre-text);
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.itemMiscInfo .starIcon{ color:var(--spectre-primary); }
+
+.mainDetailButtons{
+  display:flex;
+  gap:10px;
+  margin:18px 0;
+}
+.mainDetailButtons .btnPlay,
+.mainDetailButtons .btnReplay{
+  background:var(--spectre-primary);
+  border-radius:var(--spectre-radius-pill);
+  box-shadow:0 0 20px var(--spectre-glow);
+}
+.mainDetailButtons .btnPlay:hover,
+.mainDetailButtons .btnReplay:hover{
+  transform:scale(1.06);
+}
+.mainDetailButtons .detailButton:not(.btnPlay):not(.btnReplay){
+  background:rgba(255,255,255,.06);
+  border-radius:var(--spectre-radius-pill);
+}
+.mainDetailButtons .detailButton:not(.btnPlay):not(.btnReplay):hover{
+  background:rgba(255,255,255,.12);
+}
+
+.overview{
+  color:var(--spectre-text-secondary);
+  line-height:1.6;
+  max-width:80ch;
+}
+
+/* Genre/director/writer rows — real markup is a label + inline comma-joined
+   links, not individual chip elements, so styled as a clean label/value
+   row rather than forcing chips onto plain inline links */
+.itemDetailsGroup{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:18px;
+}
+.detailsGroupItem{
+  display:flex;
+  gap:14px;
+  font-size:.92rem;
+}
+.detailsGroupItem .label{
+  color:var(--spectre-text-muted);
+  min-width:80px;
+  font-weight:600;
+}
+.detailsGroupItem .content a{
+  color:var(--spectre-text-secondary);
+}
+.detailsGroupItem .content a:hover{
+  color:var(--spectre-primary);
+}
+
+.detailPageSecondaryContainer .sectionTitle{
+  font-size:1.15rem;
+}
+
+/* Cast & guest star cards — real markup is .card.personCard with a
+   .cardImageContainer.coveredImage inside. Forcing the reserved space
+   itself to be a true square (not just the image) is what actually fixes
+   the oval/overflow issue — aspect-ratio alone wasn't enough because
+   Jellyfin reserves this space via a padding-bottom percentage trick on
+   .cardPadder, which aspect-ratio doesn't override. */
+.card.personCard .cardPadder-overflowPortrait{
+  padding-bottom:100% !important;
+  border-radius:50%;
+}
+.card.personCard .cardImageContainer{
+  border-radius:50%;
+}
+
+/* Name + character role as one contiguous boxed label below the portrait,
+   in a distinct elevated color instead of overlapping the image */
+.card.personCard .cardText-first{
+  background:var(--spectre-bg-elevated);
+  border-radius:var(--spectre-radius-sm) var(--spectre-radius-sm) 0 0;
+  padding:8px 8px 2px;
+  margin-top:10px;
+  font-weight:600;
+  font-size:.85rem;
+  text-align:center;
+}
+.card.personCard .cardBox{
+  overflow:visible; /* the circular image already clips itself via its own border-radius, so the outer box doesn't need to — this was cutting off wrapped two-line character names */
+}
+
+.card.personCard .cardText-secondary{
+  background:var(--spectre-bg-elevated);
+  border-radius:0 0 var(--spectre-radius-sm) var(--spectre-radius-sm);
+  padding:0 8px 8px;
+  color:var(--spectre-text-muted);
+  font-size:.72rem;
+  text-align:center;
+  line-height:1.3;
+  height:auto !important;
+  min-height:2.6em;
+}
+.card.personCard .cardText-secondary,
+.card.personCard .cardText-secondary bdi,
+.card.personCard .cardText-secondary span,
+.card.personCard .cardText-secondary a{
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+  display:block;
+}
+
+.moreFromSeasonSection .card .cardText-first{
+  font-size:.82rem;
+}
+
+/*=============================================================================
+  30. DASHBOARD / SETTINGS — MUI-based interface
+  IMPORTANT DISCOVERY: unlike the rest of Jellyfin (jQuery + emby-* classes),
+  the Dashboard/Settings area is a completely separate React + MUI (Material
+  UI) application. None of the .emby-*, .card*, or .dialog rules elsewhere
+  in this file apply here — this section targets MUI's own stable component
+  classes instead. Hash classes like "css-1qq8wmv" are NOT targeted since
+  those are auto-generated per build and will change on Jellyfin updates.
+=============================================================================*/
+
+/* Top app bar */
+.MuiAppBar-root{
+  background:rgba(8,8,10,.75) !important;
+  backdrop-filter:blur(var(--spectre-blur));
+  box-shadow:none !important;
+  border-bottom:1px solid var(--spectre-border);
+}
+
+/* Left settings rail */
+.MuiDrawer-paper{
+  background:rgba(8,8,10,.6) !important;
+  border-right:1px solid var(--spectre-border) !important;
+}
+
+.MuiListSubheader-root{
+  background:transparent !important;
+  color:var(--spectre-text-muted) !important;
+  font-weight:700;
+  letter-spacing:1px;
+  font-size:.72rem;
+  text-transform:uppercase;
+}
+
+.MuiListItemButton-root{
+  border-radius:var(--spectre-radius-sm);
+  margin:2px 8px;
+  width:auto !important;
+  transition:background var(--spectre-speed) var(--spectre-ease);
+}
+.MuiListItemButton-root:hover{
+  background:rgba(255,255,255,.06) !important;
+}
+.MuiListItemButton-root.Mui-selected{
+  background:rgba(var(--spectre-primary-rgb),.16) !important;
+}
+.MuiListItemButton-root.Mui-selected .MuiListItemText-primary,
+.MuiListItemButton-root.Mui-selected .MuiListItemIcon-root svg{
+  color:var(--spectre-primary) !important;
+}
+
+.MuiListItemIcon-root svg{
+  color:var(--spectre-text-muted);
+}
+
+/* Page heading */
+.MuiTypography-h1{
+  font-family:"Inter",sans-serif;
+  font-weight:800;
+  letter-spacing:-.5px;
+  color:var(--spectre-text);
+}
+
+/* Buttons */
+.MuiButton-contained.MuiButton-containedPrimary{
+  background:var(--spectre-primary) !important;
+  border-radius:var(--spectre-radius-pill) !important;
+  box-shadow:0 0 16px var(--spectre-glow) !important;
+  text-transform:none;
+}
+.MuiButton-contained.MuiButton-containedPrimary:hover{
+  background:rgba(var(--spectre-primary-rgb),.85) !important;
+  box-shadow:0 0 22px var(--spectre-glow) !important;
+}
+
+.MuiButton-outlinedPrimary{
+  border-color:rgba(var(--spectre-primary-rgb),.5) !important;
+  color:var(--spectre-primary) !important;
+  border-radius:var(--spectre-radius-pill) !important;
+  text-transform:none;
+}
+.MuiButton-outlinedPrimary:hover{
+  background:rgba(var(--spectre-primary-rgb),.1) !important;
+  border-color:var(--spectre-primary) !important;
+}
+
+.MuiButton-outlinedError{
+  border-radius:var(--spectre-radius-pill) !important;
+  text-transform:none;
+}
+
+/* Switches / toggles */
+.MuiSwitch-track{
+  background-color:rgba(255,255,255,.2) !important;
+  opacity:1 !important;
+}
+.MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track{
+  background-color:rgba(var(--spectre-primary-rgb),.6) !important;
+}
+.MuiSwitch-switchBase.Mui-checked .MuiSwitch-thumb{
+  color:var(--spectre-primary) !important;
+}
+
+/* Text inputs / textareas */
+.MuiFilledInput-root{
+  background:var(--spectre-bg-elevated) !important;
+  border-radius:var(--spectre-radius-sm) var(--spectre-radius-sm) 0 0 !important;
+}
+.MuiFilledInput-root::before,
+.MuiFilledInput-root::after{
+  border-bottom-color:var(--spectre-border) !important;
+}
+.MuiFilledInput-root.Mui-focused::after{
+  border-bottom-color:var(--spectre-primary) !important;
+}
+.MuiInputLabel-root.Mui-focused{
+  color:var(--spectre-primary) !important;
+}
+.MuiFormHelperText-root{
+  color:var(--spectre-text-muted) !important;
+}
+
+/* Panels/cards (e.g. the splashscreen preview box) */
+.MuiPaper-rounded{
+  border-radius:var(--spectre-radius-md) !important;
+  border:1px solid var(--spectre-glass-border);
+}
+
+/*=============================================================================
+  30b. USER MENU (person icon dropdown) — now confirmed
+  Real markup is .MuiMenu-paper containing .MuiMenuItem-root links. This
+  replaces the earlier guess in Section 16b, which targeted generic
+  .dialog/.actionSheet classes that don't actually apply here.
+=============================================================================*/
+
+.MuiMenu-paper{
+  background:var(--spectre-bg-dialog) !important;
+  border:1px solid var(--spectre-glass-border);
+  border-radius:var(--spectre-radius-md) !important;
+  backdrop-filter:blur(var(--spectre-blur));
+  box-shadow:var(--spectre-shadow-lg) !important;
+}
+
+.MuiMenuItem-root{
+  border-radius:var(--spectre-radius-sm);
+  margin:2px 6px;
+  transition:background var(--spectre-speed) var(--spectre-ease);
+}
+.MuiMenuItem-root:hover{
+  background:rgba(var(--spectre-primary-rgb),.14) !important;
+}
+.MuiMenuItem-root .MuiListItemIcon-root svg{
+  color:var(--spectre-text-muted);
+}
+.MuiMenuItem-root:hover .MuiListItemIcon-root svg{
+  color:var(--spectre-primary);
+}
+
+.MuiDivider-root{
+  border-color:var(--spectre-border) !important;
+}
+
+/*=============================================================================
+  29. SEARCH PAGE
+  Confirmed against real markup: #searchPage > .searchFields containing
+  .searchFieldsInner (icon + .inputContainer > input#searchTextInput), and
+  a .searchSuggestions section with plain .emby-button.button-link links
+  (shown before typing — no query yet). Once a query returns results, those
+  render as the same .card/.cardBox markup already styled elsewhere in this
+  file, so results themselves need no separate styling.
+=============================================================================*/
+
+.searchFields{
+  padding-top:20px;
+  padding-bottom:8px;
+}
+
+.searchFieldsInner{
+  background:var(--spectre-bg-glass);
+  backdrop-filter:blur(var(--spectre-blur));
+  border:1px solid var(--spectre-glass-border);
+  border-radius:var(--spectre-radius-pill);
+  padding:10px 20px;
+  max-width:560px;
+  margin:0 auto;
+  gap:10px;
+}
+
+.searchFieldsInner .searchfields-icon{
+  color:var(--spectre-text-muted);
+}
+
+.searchFieldsInner .inputContainer{
+  margin-bottom:0 !important;
+}
+
+#searchTextInput.emby-input{
+  background:transparent;
+  border:none !important;
+  padding:6px 0;
+  font-size:1.05rem;
+}
+#searchTextInput.emby-input:focus{
+  box-shadow:none;
+}
+
+.searchSuggestions .sectionTitle{
+  border-left:none;
+  display:inline-block;
+  color:var(--spectre-text-muted);
+  font-size:1rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.searchSuggestionsList{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin-top:14px;
+}
+
+.searchSuggestionsList a.button-link{
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--spectre-glass-border);
+  border-radius:var(--spectre-radius-pill) !important;
+  color:var(--spectre-text-secondary) !important;
+  transition:background var(--spectre-speed) var(--spectre-ease),
+             color var(--spectre-speed) var(--spectre-ease),
+             border-color var(--spectre-speed) var(--spectre-ease);
+}
+.searchSuggestionsList a.button-link:hover{
+  background:rgba(var(--spectre-primary-rgb),.18);
+  border-color:rgba(var(--spectre-primary-rgb),.4);
+  color:#fff !important;
+}
