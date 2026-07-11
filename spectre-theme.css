@@ -292,9 +292,15 @@ input[is="emby-input"].headerSearchInput{
 }
 .navMenuOption:hover{ background:rgba(255,255,255,.06); }
 .navMenuOption.selected,
-.navMenuOption[aria-selected="true"]{
-  background:rgba(var(--spectre-primary-rgb),.15);
-  color:var(--spectre-primary);
+.navMenuOption[aria-selected="true"],
+.navMenuOption-selected{
+  background:rgba(var(--spectre-primary-rgb),.15) !important;
+  color:var(--spectre-primary) !important;
+}
+.navMenuOption-selected .navMenuOptionIcon,
+.navMenuOption-selected .navMenuOptionText,
+.navMenuOption-selected .sectionName{
+  color:var(--spectre-primary) !important;
 }
 .navMenuOptionIcon{ opacity:.85; }
 
@@ -1597,4 +1603,119 @@ input[is="emby-slider"]::-moz-range-thumb{
   background:rgba(var(--spectre-primary-rgb),.18);
   border-color:rgba(var(--spectre-primary-rgb),.4);
   color:#fff !important;
+}
+
+/*=============================================================================
+  33. LIBRARY BROWSE PAGE (grid view with toolbar + alpha picker)
+  Confirmed against real markup: a toolbar row (.paging, .btnSelectView,
+  .btnSort, .btnFilter-wrapper > .btnFilter, all paper-icon-button-light),
+  the grid itself (.itemsContainer.vertical-wrap of .card.portraitCard —
+  already covered by the general card rules elsewhere in this file), and
+  a vertical A–Z .alphaPicker on the right edge.
+=============================================================================*/
+
+.paging .listPaging{
+  color:var(--spectre-text-muted);
+  font-size:.85rem;
+  letter-spacing:.5px;
+}
+
+.btnSelectView,
+.btnSort,
+.btnFilter{
+  color:var(--spectre-text-secondary) !important;
+  border-radius:var(--spectre-radius-pill);
+  transition:background var(--spectre-speed) var(--spectre-ease),
+             color var(--spectre-speed) var(--spectre-ease);
+}
+.btnSelectView:hover,
+.btnSort:hover,
+.btnFilter:hover{
+  background:rgba(var(--spectre-primary-rgb),.16) !important;
+  color:var(--spectre-primary) !important;
+}
+
+/* Alphabet picker (vertical A–Z jump list on the right edge) */
+.alphaPicker{
+  background:var(--spectre-bg-glass);
+  backdrop-filter:blur(var(--spectre-blur));
+  border-radius:var(--spectre-radius-pill);
+  padding:8px 2px;
+}
+.alphaPickerButton{
+  color:var(--spectre-text-muted) !important;
+  transition:color var(--spectre-speed) var(--spectre-ease);
+}
+.alphaPickerButton:hover,
+.alphaPickerButton.selected{
+  color:var(--spectre-primary) !important;
+}
+
+/* Episode/season count badge on grouped series cards (the small "67",
+   "8" circle in the top corner) — ships in Jellyfin's default blue,
+   recolored to match the theme instead of clashing with it */
+.countIndicator{
+  background:var(--spectre-primary) !important;
+  color:#fff !important;
+}
+
+/*=============================================================================
+  34. HAMBURGER BLUE-TINT FIX
+  On certain tabs (e.g. library pages with section tabs), Jellyfin applies
+  its own default blue "active" state to .barsMenuButton — overridden here
+  so it never shows blue regardless of which tab is active.
+=============================================================================*/
+
+.barsMenuButton,
+.mainDrawerButton{
+  background:transparent !important;
+  color:inherit !important;
+}
+.barsMenuButton:hover,
+.mainDrawerButton:hover{
+  background:rgba(255,255,255,.08) !important;
+}
+
+/*=============================================================================
+  35. SECTION TABS BAR (Shows / Suggestions / Upcoming / Genres / etc.)
+  Confirmed against real markup: .headerTabs > .emby-tabs containing
+  .emby-tab-button elements (with .emby-tab-button-active on the current
+  one), each wrapping a .emby-button-foreground text label.
+=============================================================================*/
+
+.headerTabs{
+  border-bottom:1px solid var(--spectre-border);
+  background:rgba(8,8,10,.4);
+}
+
+.emby-tab-button{
+  color:var(--spectre-text-muted) !important;
+  font-weight:600;
+  padding:10px 16px;
+  border-radius:0;
+  position:relative;
+  transition:color var(--spectre-speed) var(--spectre-ease);
+}
+.emby-tab-button:hover{
+  color:var(--spectre-text) !important;
+  background:transparent;
+}
+
+.emby-tab-button-active{
+  color:var(--spectre-primary) !important;
+}
+.emby-tab-button-active::after{
+  content:"";
+  position:absolute;
+  left:16px;
+  right:16px;
+  bottom:0;
+  height:3px;
+  border-radius:3px 3px 0 0;
+  background:var(--spectre-primary);
+  box-shadow:0 0 10px var(--spectre-glow);
+}
+
+.emby-button-foreground{
+  letter-spacing:.3px;
 }
