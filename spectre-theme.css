@@ -175,13 +175,40 @@ a:hover{ color:#fff; }
 
 .headerTop{ height:68px; }
 
-/* Custom Spectre branding replacing Jellyfin's default logo/title */
+/* The video-player OSD header (.osdHeader) ships with a much taller
+   built-in gradient scrim from Jellyfin's core CSS, sized for the default
+   theme's readability fade — collapsed down here to match the normal
+   68px header instead of the oversized dark band. */
+.skinHeader.osdHeader{
+  height:68px !important;
+  min-height:68px !important;
+  max-height:68px !important;
+  background:rgba(8,8,10,.75) !important;
+  background-image:none !important;
+}
+.skinHeader.osdHeader .headerTop{
+  height:68px !important;
+}
+
+/* Custom Spectre branding, with the real page title (e.g. "S.W.A.T. -
+   S2:E1 - Shaky Town") shown as a subtitle underneath instead of hidden */
 .pageTitle,
 .pageTitleWithDefaultLogo,
 .pageTitleWithLogo{
-  font-size:0 !important;
+  font-size:.75rem !important;
+  color:var(--spectre-text-muted);
+  font-weight:500;
+  display:flex;
+  flex-direction:column;
+  line-height:1.3;
+  background-image:none !important; /* hides Jellyfin's own logo image, which reappeared once we stopped fully hiding .pageTitle for the subtitle */
 }
-.pageTitle::after{
+.pageTitleWithLogo img,
+.pageTitleWithDefaultLogo img,
+.pageTitle img{
+  display:none !important;
+}
+.pageTitle::before{
   content:"SPECTRE";
   font-size:22px;
   font-weight:800;
@@ -190,7 +217,12 @@ a:hover{ color:#fff; }
 }
 
 .headerLeft,
-.headerRight{ display:flex; align-items:center; gap:4px; }
+.headerRight{ display:flex; align-items:center; gap:4px; overflow:visible; }
+
+.headerTop{
+  height:68px;
+  overflow:visible;
+}
 
 .headerButton{
   width:40px;
@@ -402,6 +434,21 @@ label.checkboxContainer input[type="checkbox"] + span{
   border-radius:inherit;
 }
 
+/* Overflow-style cards (Shows/Continue Watching use "overflowBackdropCard",
+   cast uses "overflowPortraitCard") intentionally let Jellyfin's own image
+   bleed slightly beyond the card box as a design effect — that bleed
+   happens at the .cardScalable level, one level higher than the plain
+   default-color cards clip at, so the rounded-corner fix needs to apply
+   there too or these variants show square corners while flat-color cards
+   look rounded. */
+.cardScalable{
+  border-radius:var(--spectre-radius-md);
+  overflow:hidden;
+}
+.cardBox{
+  border-radius:var(--spectre-radius-md);
+}
+
 .cardImage{
   transition:transform var(--spectre-speed-slow) var(--spectre-ease);
 }
@@ -411,20 +458,51 @@ label.checkboxContainer input[type="checkbox"] + span{
 
 .cardContent-shadow{
   background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.75) 100%);
+  border-radius:inherit; /* without this, the darkening gradient's own corners get clipped square by the parent's rounded overflow, leaving the rounded corner pixels un-darkened */
+}
+
+/* The "More" (⋮) button shows a blue focus ring by default (keyboard/agent
+   focus outline, separate from our red hover state) — recolored to gold to
+   match the player's seek-thumb accent instead of the leftover blue. */
+.cardOverlayButton:focus,
+.cardOverlayButton:focus-visible{
+  background:#d4af37 !important;
+  outline:none;
+  box-shadow:0 0 8px rgba(212,175,55,.5);
 }
 
 .cardOverlayContainer{ border-radius:var(--spectre-radius-md); }
 
 .cardOverlayButton{
-  background:rgba(0,0,0,.55);
+  background:rgba(0,0,0,.55) !important;
   backdrop-filter:blur(10px);
   border-radius:var(--spectre-radius-pill);
   transition:background var(--spectre-speed) var(--spectre-ease),
              transform var(--spectre-speed) var(--spectre-ease);
 }
 .cardOverlayButton-hover:hover{
-  background:var(--spectre-primary);
+  background:var(--spectre-primary) !important;
   transform:scale(1.1);
+}
+
+/* The mark-played, favorite, and more-menu buttons are three separate
+   Jellyfin components (emby-playstatebutton / emby-ratingbutton / plain
+   button), each carrying enough of their own specificity that the generic
+   .cardOverlayButton-hover rule above was losing to Jellyfin's built-in
+   blue — targeted directly here to guarantee the override. */
+button[is="emby-playstatebutton"].cardOverlayButton:hover,
+button[is="emby-ratingbutton"].cardOverlayButton:hover,
+.cardOverlayButton[data-action="menu"]:hover{
+  background:var(--spectre-primary) !important;
+}
+
+/* The icon glyphs themselves (not just the button background) can carry
+   their own leftover blue fill from Jellyfin's default state classes —
+   forced white here regardless of hover state so only the circle behind
+   them changes color. */
+.cardOverlayButtonIcon,
+.cardOverlayButtonIcon-hover{
+  color:#fff !important;
 }
 
 /*=============================================================================
@@ -922,6 +1000,52 @@ input[is="emby-slider"]::-moz-range-thumb{
 }
 
 /*=============================================================================
+  31. MOBILE HEADER FIX
+  On narrow screens there isn't room for the full "SPECTRE" wordmark plus
+  every header icon (back, home, hamburger, sync, cast, search, person),
+  which was causing them to overlap. This hides the least essential icons
+  and shrinks the wordmark instead of letting them collide.
+=============================================================================*/
+
+@media (max-width:600px){
+  .pageTitle::before{
+    font-size:15px;
+    letter-spacing:3px;
+  }
+  .pageTitle{
+    font-size:.65rem !important;
+  }
+
+  /* SyncPlay and Cast are rarely used day-to-day on a phone browser and
+     take up the most space — hidden here to give the remaining icons and
+     the wordmark room to breathe. Remove this rule if you actually use
+     SyncPlay/Casting from your phone. */
+  .headerSyncButton,
+  .headerCastButton{
+    display:none !important;
+  }
+
+  .headerButton{
+    width:34px;
+    height:34px;
+  }
+
+  .headerLeft,
+  .headerRight{
+    gap:0;
+  }
+}
+
+@media (max-width:400px){
+  .pageTitle::before{
+    display:none; /* on very small phones, drop the wordmark entirely and rely on icons alone */
+  }
+  .pageTitle{
+    font-size:.6rem !important;
+  }
+}
+
+/*=============================================================================
   END OF SPECTRE
 =============================================================================*/
 
@@ -1197,6 +1321,45 @@ input[is="emby-slider"]::-moz-range-thumb{
 
 .moreFromSeasonSection .card .cardText-first{
   font-size:.82rem;
+}
+
+/*=============================================================================
+  32. SIDE-BY-SIDE: NEXT UP + RECENTLY ADDED IN SHOWS
+  These two sections (.section5 = Next Up, .section6 = Recently Added in
+  Shows) are already directly adjacent siblings in the DOM, so no
+  reordering is needed — just forcing each to take half-width via flexbox
+  so they wrap onto the same row instead of stacking full-width. Each
+  section keeps its own independent horizontal scroller, just with less
+  width to work with. RISK NOTED: if either section is empty/hidden (e.g.
+  no next-up episodes), the other will still show at half-width with empty
+  space next to it rather than expanding to fill the row, since pure CSS
+  can't detect "sibling is empty" — flag this if it looks odd and I can
+  add a fallback.
+=============================================================================*/
+
+.homeSectionsContainer{
+  display:flex;
+  flex-wrap:wrap;
+  gap:24px;
+}
+
+.homeSectionsContainer > *{
+  flex:1 1 100%;
+  max-width:100%;
+}
+
+.homeSectionsContainer > .section5,
+.homeSectionsContainer > .section6{
+  flex:1 1 calc(50% - 12px);
+  max-width:calc(50% - 12px);
+}
+
+@media (max-width:900px){
+  .homeSectionsContainer > .section5,
+  .homeSectionsContainer > .section6{
+    flex:1 1 100%;
+    max-width:100%;
+  }
 }
 
 /*=============================================================================
