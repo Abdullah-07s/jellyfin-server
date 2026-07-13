@@ -386,13 +386,20 @@ button{
 /* Checkboxes */
 .emby-checkbox-label{ color:var(--spectre-text-secondary); }
 .checkboxOutline{
+  background:transparent !important;
+  border:2px solid var(--spectre-glass-border) !important;
   border-radius:6px !important;
-  border-color:var(--spectre-glass-border) !important;
+}
+.checkboxIcon-checked,
+.checkboxIcon-unchecked{
+  background:transparent !important;
 }
 .checkboxIcon-checked{
   color:var(--spectre-primary) !important;
 }
-
+.emby-checkbox:checked ~ .checkboxOutline{
+  border-color:var(--spectre-primary) !important;
+}
 /* Dropdowns */
 .selectContainer{
   background:var(--spectre-bg-elevated);
@@ -1352,6 +1359,7 @@ input[is="emby-slider"]::-moz-range-thumb{
 .homeSectionsContainer > *{
   flex:1 1 100%;
   max-width:100%;
+  min-width:0;
 }
 
 .homeSectionsContainer > .section5,
@@ -1718,4 +1726,23 @@ input[is="emby-slider"]::-moz-range-thumb{
 
 .emby-button-foreground{
   letter-spacing:.3px;
+}
+
+.itemProgressBar{
+  background:rgba(255,255,255,.2) !important;
+}
+.itemProgressBarForeground{
+  background:#06b6d4 !important;
+  box-shadow:0 0 6px rgba(6,182,212,.5);
+}
+
+@media (max-width:600px){
+  .headerTabs .emby-tabs-slider{
+    justify-content:flex-start !important;
+    padding-left:8px;
+  }
+  .headerTabs{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
 }
