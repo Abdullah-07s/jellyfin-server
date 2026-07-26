@@ -2,7 +2,7 @@
 
 A premium, cinematic theme for [Jellyfin](https://jellyfin.org) — dark, glassmorphic, with crimson accents. Built and tested against Jellyfin **10.11.11**.
 
-Splash Image.png
+![Splash Image](Splash%20Image.png)
 
 ## Features
 
