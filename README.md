@@ -2,7 +2,7 @@
 
 A premium, cinematic theme for [Jellyfin](https://jellyfin.org) — dark, glassmorphic, with crimson accents. Built and tested against Jellyfin **10.11.11**.
 
-![Spectre splash screen](Splach Image.png)
+![Spectre splash screen](Splash Image.png)
 
 ## Features
 
