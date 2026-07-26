@@ -2307,3 +2307,61 @@ input[is="emby-slider"]::-moz-range-thumb{
   background-position:center !important;
   background-color:var(--spectre-bg-card) !important;
 }
+
+/*=============================================================================
+  23. MOBILE FIXES — MY MEDIA + CONTINUE PLAYING
+=============================================================================*/
+@media (max-width:600px){
+  /* Reset the desktop zoom so cards fit within the screen width */
+  .section0 .card{
+    zoom:1 !important;
+  }
+  .section0 .itemsContainer{
+    flex-wrap:wrap;
+    gap:12px;
+    padding:0 12px;
+  }
+  .section0 .card{
+    width:calc(50% - 6px) !important;
+  }
+
+  /* Continue Playing: left-align and let the row scroll instead of
+     centering a single oversized card */
+  .section5 .itemsContainer{
+    justify-content:flex-start !important;
+    padding:0 12px;
+  }
+  .section5 .emby-scroller,
+  .section5 .scrollSlider{
+    padding-left:0 !important;
+    margin-left:0 !important;
+  }
+}
+
+/*=============================================================================
+  24. FIX MOBILE "MY MEDIA" — CARDS COLLAPSED TO ZERO WIDTH
+=============================================================================*/
+@media (max-width:600px){
+  .section0 .itemsContainer{
+    width:100% !important;
+    justify-content:flex-start !important;
+  }
+}
+
+/*=============================================================================
+  25. HIDE "MY MEDIA" ENTIRELY ON MOBILE
+=============================================================================*/
+@media (max-width:600px){
+  .homeSectionsContainer > .section0{
+    display:none !important;
+  }
+}
+
+/*=============================================================================
+  27. FIX MISSING GLYPHS ON ALL HOVERED OVERLAY BUTTONS
+=============================================================================*/
+.cardOverlayButton-hover:hover .material-icons{
+  color:#fff !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
