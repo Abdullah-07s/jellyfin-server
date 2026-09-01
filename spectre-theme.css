@@ -1206,5 +1206,18 @@ input[is="emby-slider"]::-moz-range-thumb{
 }
 
 /*=============================================================================
+  22b. MEDIA FOLDER CARD BORDERS (Series / Movies / Live TV on home)
+=============================================================================*/
+.section0 .cardBox{
+  border:2px solid rgba(var(--spectre-primary-rgb),.5);
+  transition:border-color var(--spectre-speed) var(--spectre-ease),
+             box-shadow var(--spectre-speed) var(--spectre-ease);
+}
+.section0 .card-hoverable:hover .cardBox{
+  border-color:var(--spectre-primary);
+  box-shadow:0 0 14px var(--spectre-glow);
+}
+
+/*=============================================================================
   END OF SPECTRE 
 =============================================================================*/
