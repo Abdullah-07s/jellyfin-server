@@ -539,11 +539,37 @@ button[is="emby-ratingbutton"].cardOverlayButton:hover,
   color:#fff;
   margin:0 auto;
 }
-.section0 .card{ zoom:1.25; }
+.section0 .card{
+  /* `zoom` was unreliable during scroll repaint (clipped edges) and fought
+     with the hover transform (icon clipping, page-jump on hover). A real
+     transform scale is layout-stable and composes cleanly with hover. */
+  transform:scale(1.1);
+  transform-origin:center;
+}
 .section0 .cardBox{ border-radius:var(--spectre-radius-lg); }
+/* Inner image/scalable layers default to --spectre-radius-md (and the
+   generic hover rule also forces radius-md), which is smaller than this
+   card's radius-lg border. That mismatch let the image's squarer corner
+   poke out past the more-rounded border. Force both to match, always. */
+.section0 .cardImageContainer,
+.section0 .cardScalable,
+.section0 .cardImage,
+.section0 .card-hoverable:hover .cardImageContainer,
+.section0 .card-hoverable:hover .cardScalable{
+  border-radius:var(--spectre-radius-lg) !important;
+}
 .section0 .cardText-first{ display:none !important; }
 .section0 .emby-scroller{ display:flex; justify-content:center; }
-.section0 .itemsContainer{ display:flex; justify-content:center; width:auto !important; }
+.section0 .itemsContainer{
+  display:flex;
+  justify-content:center;
+  width:auto !important;
+  /* transform:scale() on .card grows it from its own center without
+     reserving layout space, so it eats into the default card spacing.
+     This gap adds real, unscaled space back between the flex items. */
+  gap:32px;
+  margin:28px 0 40px;
+}
 
 /*=============================================================================
   10. "CONTINUE WATCHING" (.section1) — final state
@@ -1216,8 +1242,428 @@ input[is="emby-slider"]::-moz-range-thumb{
 .section0 .card-hoverable:hover .cardBox{
   border-color:var(--spectre-primary);
   box-shadow:0 0 14px var(--spectre-glow);
+  /* Hover lift, scoped to just .cardBox (not the already-scaled .card),
+     so it composes with the parent's transform:scale(1.25) instead of
+     fighting it. Kept overflow:hidden so the icon/image never pokes out. */
+  transform:translateY(-6px) scale(1.06) !important;
+  overflow:hidden !important;
+  z-index:5 !important;
+}
+.section0 .card-hoverable:hover .cardImage{
+  transform:scale(1.08);
 }
 
-/*=============================================================================
-  END OF SPECTRE 
-=============================================================================*/
+/*-----------------------------------------------------------------------------
+  23. PAGE / BACKGROUND FIX
+  Prevent Jellyfin's layout containment from clipping the background while
+  scrolling. The existing SPECTRE background image remains untouched.
+-----------------------------------------------------------------------------*/
+
+.mainAnimatedPage{
+  contain:none !important;
+}
+
+
+/* Keep the page itself transparent so the existing SPECTRE background
+   continues to show cleanly behind all content. */
+#indexPage,
+#searchPage{
+  background-color:transparent !important;
+
+  /* Use the existing background image already defined earlier in the theme. */
+  background-attachment:fixed !important;
+  background-size:cover !important;
+  background-position:center 30% !important;
+  background-repeat:no-repeat !important;
+
+  /* Prevent background painting from being restricted by a small page box. */
+  min-height:100vh !important;
+
+  /* Do not create a clipping container. */
+  overflow:visible !important;
+}
+
+
+/* Make the main body itself stable while the content scrolls. */
+.skinBody{
+  min-height:100vh !important;
+  background-attachment:fixed !important;
+}
+
+
+/* Prevent page wrappers from accidentally clipping the fixed background. */
+.page,
+.pageContainer,
+.homePage,
+.libraryPage{
+  overflow:visible;
+}
+
+
+/*-----------------------------------------------------------------------------
+  24. GENERAL CARD HOVER RESET
+  One element controls the card movement.
+  The image only receives a subtle zoom.
+-----------------------------------------------------------------------------*/
+
+/* Card itself stays at normal scale.
+   This removes the old permanent scale(1.1) from .section0 .card. */
+.card{
+  transform:none;
+  transform-origin:center center;
+}
+
+
+/* Stable card box. */
+.cardBox{
+  position:relative;
+  transform:none;
+  transform-origin:center center;
+
+  transition:
+    transform 250ms cubic-bezier(.22,.61,.36,1),
+    box-shadow 250ms cubic-bezier(.22,.61,.36,1),
+    border-color 250ms cubic-bezier(.22,.61,.36,1);
+
+  will-change:transform;
+}
+
+
+/* Normal poster/card clipping. */
+.cardImageContainer{
+  overflow:hidden !important;
+}
+
+
+/* Smooth image animation. */
+.cardImage{
+  transition:
+    transform 350ms cubic-bezier(.22,.61,.36,1) !important;
+
+  will-change:transform;
+}
+
+
+/*-----------------------------------------------------------------------------
+  25. STANDARD POSTER HOVER
+-----------------------------------------------------------------------------*/
+
+.card-hoverable:hover{
+  z-index:20 !important;
+}
+
+
+/* Only the card box lifts.
+   No second scale is applied here. */
+.card-hoverable:hover .cardBox{
+  transform:translateY(-5px) !important;
+
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.45) !important;
+
+  overflow:visible !important;
+}
+
+
+/* Subtle image zoom instead of the aggressive 1.08 zoom. */
+.card-hoverable:hover .cardImage{
+  transform:scale(1.035) !important;
+}
+
+
+/*-----------------------------------------------------------------------------
+  26. MY MEDIA / SERIES / MOVIES / LIVE TV
+  These are the three large cards visible at the top of your screenshot.
+-----------------------------------------------------------------------------*/
+
+.section0{
+  position:relative;
+  z-index:2;
+}
+
+
+/* Remove the old permanent transform:scale(1.1). */
+.section0 .card{
+  transform:none !important;
+  transform-origin:center center !important;
+
+  /* Give the card enough room so hover doesn't collide with neighbours. */
+  position:relative;
+  z-index:1;
+}
+
+
+/* Keep the large premium rounded appearance. */
+.section0 .cardBox{
+  position:relative;
+
+  border-radius:var(--spectre-radius-lg) !important;
+
+  overflow:hidden !important;
+
+  transform:none !important;
+
+  transition:
+    transform 250ms cubic-bezier(.22,.61,.36,1),
+    box-shadow 250ms cubic-bezier(.22,.61,.36,1),
+    border-color 250ms cubic-bezier(.22,.61,.36,1) !important;
+
+  will-change:transform;
+}
+
+
+/* Hover only lifts the box.
+   No scale stacking. */
+.section0 .card-hoverable:hover{
+  z-index:50 !important;
+}
+
+
+.section0 .card-hoverable:hover .cardBox{
+  transform:translateY(-7px) !important;
+
+  border-color:var(--spectre-primary) !important;
+
+  box-shadow:
+    0 16px 38px rgba(0,0,0,.55),
+    0 0 18px var(--spectre-glow) !important;
+
+  overflow:hidden !important;
+}
+
+
+/* Subtle cinematic image movement. */
+.section0 .card-hoverable:hover .cardImage{
+  transform:scale(1.035) !important;
+}
+
+
+/*-----------------------------------------------------------------------------
+  27. MY MEDIA IMAGE CORNERS
+-----------------------------------------------------------------------------*/
+
+.section0 .cardImageContainer,
+.section0 .cardScalable,
+.section0 .cardImage{
+  border-radius:var(--spectre-radius-lg) !important;
+}
+
+
+/* Make sure the image itself cannot escape the rounded card. */
+.section0 .cardImageContainer{
+  overflow:hidden !important;
+  isolation:isolate;
+}
+
+
+/*-----------------------------------------------------------------------------
+  28. MY MEDIA SPACING
+  Give hovered cards real layout breathing room instead of relying on
+  transform scaling.
+-----------------------------------------------------------------------------*/
+
+.section0 .itemsContainer{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+
+  width:auto !important;
+
+  /* Real spacing instead of using transform:scale(). */
+  gap:32px !important;
+
+  /* Extra vertical room for the hover lift. */
+  padding-top:12px !important;
+  padding-bottom:20px !important;
+
+  margin:16px 0 32px !important;
+
+  overflow:visible !important;
+}
+
+
+/* The scroller must also allow the hover card to rise cleanly. */
+.section0 .emby-scroller{
+  overflow:visible !important;
+
+  padding-top:10px !important;
+  padding-bottom:25px !important;
+}
+
+
+/*-----------------------------------------------------------------------------
+  29. MY MEDIA CARD IMAGE / OVERLAY STABILITY
+-----------------------------------------------------------------------------*/
+
+.section0 .cardScalable{
+  overflow:hidden !important;
+  isolation:isolate;
+}
+
+
+.section0 .cardOverlayContainer{
+  border-radius:var(--spectre-radius-lg) !important;
+  overflow:visible !important;
+}
+
+
+/* Keep the three-dot menu visible when hovering. */
+.section0 .cardOverlayButton{
+  position:relative;
+  z-index:10;
+}
+
+
+/*-----------------------------------------------------------------------------
+  30. PREVENT HOVER FROM CHANGING THE PAGE'S LAYOUT
+-----------------------------------------------------------------------------*/
+
+.section0 .card-hoverable,
+.section0 .card,
+.section0 .cardBox{
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+
+/* Avoid accidental horizontal scrollbar caused by transformed cards. */
+.section0{
+  overflow:visible !important;
+}
+
+
+/*-----------------------------------------------------------------------------
+  31. CONTINUE WATCHING
+  Keep normal cards stable as well.
+-----------------------------------------------------------------------------*/
+
+.section1 .cardBox{
+  transform:none !important;
+  transform-origin:center center !important;
+
+  transition:
+    transform 250ms cubic-bezier(.22,.61,.36,1),
+    box-shadow 250ms cubic-bezier(.22,.61,.36,1) !important;
+}
+
+
+.section1 .card-hoverable:hover .cardBox{
+  transform:translateY(-5px) !important;
+
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.45) !important;
+}
+
+
+.section1 .card-hoverable:hover .cardImage{
+  transform:scale(1.035) !important;
+}
+
+
+/*-----------------------------------------------------------------------------
+  32. OTHER HOME ROWS
+-----------------------------------------------------------------------------*/
+
+.section5 .cardBox{
+  transform:none !important;
+  transform-origin:center center !important;
+}
+
+
+.section5 .card-hoverable:hover .cardBox{
+  transform:translateY(-5px) !important;
+
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.45) !important;
+}
+
+
+.section5 .card-hoverable:hover .cardImage{
+  transform:scale(1.035) !important;
+}
+
+
+/*-----------------------------------------------------------------------------
+  33. REMOVE CONFLICTING OLD MY MEDIA HOVER RULES
+  These explicitly override the earlier rules in the theme.
+-----------------------------------------------------------------------------*/
+
+.section0 .card-hoverable:hover .cardBox{
+  transform:translateY(-7px) !important;
+  overflow:hidden !important;
+}
+
+
+.section0 .card-hoverable:hover .cardImage{
+  transform:scale(1.035) !important;
+}
+
+
+/*-----------------------------------------------------------------------------
+  34. MOBILE
+-----------------------------------------------------------------------------*/
+
+@media (max-width:900px){
+
+  .section0 .itemsContainer{
+    gap:20px !important;
+  }
+
+}
+
+
+@media (max-width:700px){
+
+  .section0 .itemsContainer{
+    gap:16px !important;
+    padding-top:8px !important;
+    padding-bottom:16px !important;
+  }
+
+  .section0 .card-hoverable:hover .cardBox{
+    transform:translateY(-3px) !important;
+  }
+
+  .section0 .card-hoverable:hover .cardImage{
+    transform:scale(1.02) !important;
+  }
+
+}
+
+
+@media (max-width:500px){
+
+  .section0 .itemsContainer{
+    gap:12px !important;
+  }
+
+}
+
+
+/*-----------------------------------------------------------------------------
+  35. REDUCED MOTION
+-----------------------------------------------------------------------------*/
+
+@media (prefers-reduced-motion:reduce){
+
+  .cardBox,
+  .cardImage{
+    transition:none !important;
+  }
+
+  .card-hoverable:hover .cardBox,
+  .section0 .card-hoverable:hover .cardBox,
+  .section1 .card-hoverable:hover .cardBox,
+  .section5 .card-hoverable:hover .cardBox{
+    transform:none !important;
+  }
+
+  .card-hoverable:hover .cardImage,
+  .section0 .card-hoverable:hover .cardImage,
+  .section1 .card-hoverable:hover .cardImage,
+  .section5 .card-hoverable:hover .cardImage{
+    transform:none !important;
+  }
+
+}
+
