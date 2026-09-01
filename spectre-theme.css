@@ -106,7 +106,7 @@ a:hover{ color:#fff; }
 .mainAnimatedPage{ contain:layout style size; }
 
 /*=============================================================================
-  02. PAGE BACKGROUND (was defined 3x before — one rule now)
+  02. PAGE BACKGROUND 
 =============================================================================*/
 .skinBody{
   background:
@@ -465,7 +465,7 @@ button[is="emby-ratingbutton"].cardOverlayButton:hover,
 }
 
 /*=============================================================================
-  08. SECTION TITLES / HOME PAGE ROWS (general)
+  08. SECTION TITLES / HOME PAGE ROWS 
 =============================================================================*/
 
 .sectionTitle{
@@ -512,7 +512,7 @@ button[is="emby-ratingbutton"].cardOverlayButton:hover,
 }
 
 /*=============================================================================
-  09. "MY MEDIA" (.section0) — final state
+  09. "MY MEDIA" (.section0) 
 =============================================================================*/
 
 .section0{
@@ -572,7 +572,7 @@ button[is="emby-ratingbutton"].cardOverlayButton:hover,
 }
 
 /*=============================================================================
-  10. "CONTINUE WATCHING" (.section1) — final state
+  10. "CONTINUE WATCHING" 
 =============================================================================*/
 
 .section1{ padding-left:24px !important; }
@@ -617,8 +617,7 @@ button[is="emby-ratingbutton"].cardOverlayButton:hover,
 }
 
 /*=============================================================================
-  11. "CONTINUE PLAYING" / Next Up (.section5) — final state
-  Renamed from "Next Up" via CSS text-swap (real label is HTML content).
+  11. "CONTINUE PLAYING" / Next Up (.section5)
 =============================================================================*/
 
 .section5 .sectionTitle{ font-size:0 !important; }
