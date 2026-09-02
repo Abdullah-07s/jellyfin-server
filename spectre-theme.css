@@ -617,13 +617,12 @@ button[is="emby-ratingbutton"].cardOverlayButton:hover,
 }
 
 /*=============================================================================
-  11. "CONTINUE PLAYING" / Next Up (.section5) — final state
-  Renamed from "Next Up" via CSS text-swap (real label is HTML content).
+  11. "NEXT UP" (.section5) — final state
 =============================================================================*/
 
 .section5 .sectionTitle{ font-size:0 !important; }
 .section5 .sectionTitle::before{
-  content:"Continue Playing";
+  content:"Next Up";
   font-size:1.25rem;
   font-weight:700;
 }
